@@ -1,0 +1,379 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>FitTech Pro - AI-Powered Fitness Platform</title>
+    
+    <!-- Tailwind CSS -->
+    <script src="https://cdn.tailwindcss.com"></script>
+    
+    <!-- Google Fonts -->
+    <link href="https://fonts.googleapis.com/css2?family=Orbitron:wght@400;500;600;700&family=Rajdhani:wght@300;400;500;600;700&display=swap" rel="stylesheet">
+    
+    <!-- Bootstrap Icons -->
+    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.11.1/font/bootstrap-icons.css">
+
+    <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+
+    <style>
+        :root {
+            --neon-blue: #00f3ff;
+            --neon-purple: #bf00ff;
+            --dark-bg: #0a0a0a;
+        }
+
+        body {
+            font-family: 'Rajdhani', sans-serif;
+            background: var(--dark-bg);
+            color: #fff;
+        }
+
+        .orbitron {
+            font-family: 'Orbitron', sans-serif;
+        }
+
+        .neon-text {
+            text-shadow: 0 0 10px var(--neon-blue),
+                         0 0 20px var(--neon-blue),
+                         0 0 30px var(--neon-blue);
+        }
+
+        .neon-border {
+            border: 2px solid var(--neon-blue);
+            box-shadow: 0 0 10px var(--neon-blue),
+                       inset 0 0 10px var(--neon-blue);
+        }
+
+        .neon-button {
+            background: transparent;
+            border: 2px solid var(--neon-blue);
+            color: var(--neon-blue);
+            transition: all 0.3s;
+        }
+
+        .neon-button:hover {
+            background: var(--neon-blue);
+            color: var(--dark-bg);
+            box-shadow: 0 0 20px var(--neon-blue);
+        }
+
+        .grid-bg {
+            background-image: linear-gradient(var(--neon-blue) 1px, transparent 1px),
+                            linear-gradient(90deg, var(--neon-blue) 1px, transparent 1px);
+            background-size: 20px 20px;
+            background-color: rgba(0,0,0,0.97);
+            opacity: 0.1;
+            position: fixed;
+            top: 0;
+            left: 0;
+            right: 0;
+            bottom: 0;
+            z-index: -1;
+        }
+
+        .glass-effect {
+            background: rgba(255,255,255,0.05);
+            backdrop-filter: blur(10px);
+            border: 1px solid rgba(255,255,255,0.1);
+        }
+
+        .loading-spinner {
+            border: 4px solid rgba(0, 243, 255, 0.1);
+            border-left: 4px solid var(--neon-blue);
+            border-radius: 50%;
+            width: 40px;
+            height: 40px;
+            animation: spin 1s linear infinite;
+        }
+
+        @keyframes spin {
+            0% { transform: rotate(0deg); }
+            100% { transform: rotate(360deg); }
+        }
+    </style>
+</head>
+<body class="min-h-screen">
+    <div class="grid-bg"></div>
+
+    <!-- Navigation -->
+    <nav class="glass-effect fixed w-full z-50 px-4 py-2">
+        <div class="container mx-auto flex justify-between items-center">
+            <h1 class="orbitron text-2xl neon-text">FitTech Pro</h1>
+            <div class="hidden md:flex space-x-6">
+                <a href="#" class="hover:text-cyan-400 transition-colors">Dashboard</a>
+                <a href="#" class="hover:text-cyan-400 transition-colors">Trainers</a>
+                <a href="#" class="hover:text-cyan-400 transition-colors">Clients</a>
+                <a href="#" class="hover:text-cyan-400 transition-colors">Reports</a>
+            </div>
+            <div class="flex items-center space-x-4">
+                <button id="theme-toggle" class="neon-button px-4 py-2 rounded-lg">
+                    <i class="bi bi-moon-stars"></i>
+                </button>
+                <div class="relative" id="profile-dropdown">
+                    <button class="flex items-center space-x-2">
+                        <img src="https://api.dicebear.com/6.x/avataaars/svg?seed=Felix" class="w-8 h-8 rounded-full">
+                        <span>Admin</span>
+                    </button>
+                </div>
+            </div>
+        </div>
+    </nav>
+
+    <!-- Main Content -->
+    <div class="pt-20 px-4">
+        <div class="container mx-auto">
+            <!-- Dashboard Grid -->
+            <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
+                
+                <!-- Performance Stats -->
+                <div class="glass-effect rounded-xl p-6 space-y-4">
+                    <h2 class="orbitron text-xl flex items-center">
+                        <i class="bi bi-graph-up-arrow mr-2"></i>
+                        Performance Stats
+                    </h2>
+                    <canvas id="performanceChart"></canvas>
+                </div>
+
+                <!-- Client Management -->
+                <div class="glass-effect rounded-xl p-6">
+                    <h2 class="orbitron text-xl mb-4 flex items-center">
+                        <i class="bi bi-people mr-2"></i>
+                        Client Management
+                    </h2>
+                    <div class="space-y-4">
+                        <button id="addClientBtn" class="neon-button w-full py-2 rounded-lg flex items-center justify-center">
+                            <i class="bi bi-plus-lg mr-2"></i>
+                            Add New Client
+                        </button>
+                        <div class="space-y-2 max-h-60 overflow-y-auto">
+                            <!-- Client list will be populated here -->
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Feedback System -->
+                <div class="glass-effect rounded-xl p-6">
+                    <h2 class="orbitron text-xl mb-4 flex items-center">
+                        <i class="bi bi-star mr-2"></i>
+                        Recent Feedback
+                    </h2>
+                    <div id="feedbackList" class="space-y-4 max-h-60 overflow-y-auto">
+                        <!-- Feedback items will be populated here -->
+                    </div>
+                </div>
+            </div>
+
+            <!-- Sales & CRM Section -->
+            <div class="mt-6 grid grid-cols-1 md:grid-cols-2 gap-6">
+                <div class="glass-effect rounded-xl p-6">
+                    <h2 class="orbitron text-xl mb-4 flex items-center">
+                        <i class="bi bi-currency-dollar mr-2"></i>
+                        Sales Dashboard
+                    </h2>
+                    <canvas id="salesChart"></canvas>
+                </div>
+
+                <div class="glass-effect rounded-xl p-6">
+                    <h2 class="orbitron text-xl mb-4 flex items-center">
+                        <i class="bi bi-person-vcard mr-2"></i>
+                        CRM Overview
+                    </h2>
+                    <div class="grid grid-cols-2 gap-4">
+                        <div class="text-center p-4 neon-border rounded-lg">
+                            <h3 class="text-sm">Active Members</h3>
+                            <p class="text-2xl neon-text" id="activeMembersCount">0</p>
+                        </div>
+                        <div class="text-center p-4 neon-border rounded-lg">
+                            <h3 class="text-sm">Pending Leads</h3>
+                            <p class="text-2xl neon-text" id="pendingLeadsCount">0</p>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Modals -->
+    <!-- Add Client Modal -->
+    <div id="addClientModal" class="hidden fixed inset-0 bg-black bg-opacity-50 z-50 flex items-center justify-center">
+        <div class="glass-effect rounded-xl p-6 w-full max-w-md">
+            <h2 class="orbitron text-xl mb-4">Add New Client</h2>
+            <form id="addClientForm" class="space-y-4">
+                <div>
+                    <label class="block mb-1">Name</label>
+                    <input type="text" class="w-full bg-transparent neon-border rounded-lg px-4 py-2" required>
+                </div>
+                <div>
+                    <label class="block mb-1">Email</label>
+                    <input type="email" class="w-full bg-transparent neon-border rounded-lg px-4 py-2" required>
+                </div>
+                <div>
+                    <label class="block mb-1">Membership Type</label>
+                    <select class="w-full bg-transparent neon-border rounded-lg px-4 py-2">
+                        <option value="basic">Basic</option>
+                        <option value="premium">Premium</option>
+                        <option value="elite">Elite</option>
+                    </select>
+                </div>
+                <div class="flex space-x-4">
+                    <button type="submit" class="neon-button flex-1 py-2 rounded-lg">Add Client</button>
+                    <button type="button" onclick="closeModal('addClientModal')" class="neon-button flex-1 py-2 rounded-lg">Cancel</button>
+                </div>
+            </form>
+        </div>
+    </div>
+
+    <script>
+        // Initialize charts
+        const performanceCtx = document.getElementById('performanceChart').getContext('2d');
+        const salesCtx = document.getElementById('salesChart').getContext('2d');
+
+        // Performance Chart
+        new Chart(performanceCtx, {
+            type: 'line',
+            data: {
+                labels: ['Jan', 'Feb', 'Mar', 'Apr', 'May', 'Jun'],
+                datasets: [{
+                    label: 'Trainer Performance',
+                    data: [75, 82, 80, 85, 88, 90],
+                    borderColor: '#00f3ff',
+                    tension: 0.4
+                }]
+            },
+            options: {
+                responsive: true,
+                plugins: {
+                    legend: {
+                        labels: {
+                            color: '#fff'
+                        }
+                    }
+                },
+                scales: {
+                    y: {
+                        grid: {
+                            color: 'rgba(255,255,255,0.1)'
+                        },
+                        ticks: {
+                            color: '#fff'
+                        }
+                    },
+                    x: {
+                        grid: {
+                            color: 'rgba(255,255,255,0.1)'
+                        },
+                        ticks: {
+                            color: '#fff'
+                        }
+                    }
+                }
+            }
+        });
+
+        // Sales Chart
+        new Chart(salesCtx, {
+            type: 'bar',
+            data: {
+                labels: ['Jan', 'Feb', 'Mar', 'Apr', 'May', 'Jun'],
+                datasets: [{
+                    label: 'Monthly Sales',
+                    data: [12000, 15000, 18000, 16000, 20000, 22000],
+                    backgroundColor: '#00f3ff',
+                }]
+            },
+            options: {
+                responsive: true,
+                plugins: {
+                    legend: {
+                        labels: {
+                            color: '#fff'
+                        }
+                    }
+                },
+                scales: {
+                    y: {
+                        grid: {
+                            color: 'rgba(255,255,255,0.1)'
+                        },
+                        ticks: {
+                            color: '#fff'
+                        }
+                    },
+                    x: {
+                        grid: {
+                            color: 'rgba(255,255,255,0.1)'
+                        },
+                        ticks: {
+                            color: '#fff'
+                        }
+                    }
+                }
+            }
+        });
+
+        // Mock Data
+        let clients = [];
+        let feedback = [];
+
+        // Functions
+        function openModal(id) {
+            document.getElementById(id).classList.remove('hidden');
+        }
+
+        function closeModal(id) {
+            document.getElementById(id).classList.add('hidden');
+        }
+
+        // Event Listeners
+        document.getElementById('addClientBtn').addEventListener('click', () => {
+            openModal('addClientModal');
+        });
+
+        document.getElementById('addClientForm').addEventListener('submit', (e) => {
+            e.preventDefault();
+            // Add client logic here
+            closeModal('addClientModal');
+        });
+
+        // Initialize mock data
+        document.getElementById('activeMembersCount').textContent = '157';
+        document.getElementById('pendingLeadsCount').textContent = '23';
+
+        // Theme toggle
+        document.getElementById('theme-toggle').addEventListener('click', () => {
+            document.body.classList.toggle('light-mode');
+        });
+
+        // API Integration
+        async function fetchData() {
+            try {
+                const response = await fetch('https://r0c8kgwocscg8gsokogwwsw4.zetaverse.one/mongodb', {
+                    method: 'POST',
+                    headers: {
+                        'Authorization': 'Bearer tmLNDs4XgSfVmkFcQ5xQmqYBoHw1',
+                        'Content-Type': 'application/json'
+                    },
+                    body: JSON.stringify({
+                        appSlug: 'fitness-platform-123',
+                        action: 'read',
+                        collection: 'clients'
+                    })
+                });
+                
+                if (response.ok) {
+                    const data = await response.json();
+                    // Update UI with fetched data
+                    updateClientsList(data.result.read);
+                }
+            } catch (error) {
+                console.error('Error fetching data:', error);
+            }
+        }
+
+        // Call initial data fetch
+        fetchData();
+    </script>
+<script>document.body.addEventListener('wheel', e => { if (!e.ctrlKey) return; e.preventDefault(); return }, { passive: false })</script>
+	</body>
+</html>
